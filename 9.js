@@ -55,9 +55,12 @@ cylon.robot({
   },
   turnLock: function(val) {
     var that = this;
+    var currentAngle = that.servo.currentAngle();
     var angle = val.fromScale(0, 1023).toScale(0,180) | 0;
-    console.log("turning lock:", angle);
-    that.servo.angle(angle);
+    if (angle <= currentAngle - 3 || angle >= currentAngle + 3) {
+      console.log("turning lock:", angle);
+      that.servo.angle(angle);
+    }
   },
   doorbell: function() {
     var that = this;
@@ -70,8 +73,6 @@ cylon.robot({
   writeMessage: function(message, color) {
     var that = this;
     console.log(message);
-    that.screen.clear();
-    that.screen.home();
     that.screen.setCursor(0,0);
     that.screen.write(message.toString());
     switch(color)
