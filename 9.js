@@ -15,6 +15,7 @@ cylon.robot({
   },
   devices: {
     // digital sensors
+    button: { driver: "button",        pin: 2, connection: "edison" },
     servo:  { driver: "servo",         pin: 3, connection: "edison" },
     led:    { driver: "led",           pin: 4, connection: "edison" },
     buzzer: { driver: "direct-pin",    pin: 7, connection: "edison" },
@@ -31,7 +32,7 @@ cylon.robot({
     var that = this;
     var deg = that.temp.value();
     console.log("current temp:", deg);
-    if (deg >= 25) {
+    if (deg >= 30) {
       that.writeMessage("it's hot in here!", "red");
       that.buzzer.digitalWrite(1);
       setTimeout(function() {
@@ -89,11 +90,23 @@ cylon.robot({
         break;
     }
   },
+  setup: function() {
+    this.writeMessage("ready");
+    this.led.turnOff();
+    this.buzzer.digitalWrite(0);
+  },
   work: function() {
     var that = this;
+    that.setup();
+
+    that.button.on('push', function() {
+      that.led.turnOn();
+    });
  
-    that.writeMessage("ready");
- 
+    that.button.on('release', function() {
+      that.led.turnOff();
+    });
+
     that.dial.on('analogRead', function(val) {
       that.turnLock(val);
     });
