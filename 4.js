@@ -45,13 +45,13 @@ cylon.robot({
         break;
     }
   },
-  setup: function() {
+  reset: function() {
     this.writeMessage("Doorbot ready");
     this.led.turnOff();
   },
   work: function() {
     var that = this;
-    that.setup();
+    that.reset();
 
     that.button.on('push', function() {
       that.led.turnOn();
@@ -59,8 +59,7 @@ cylon.robot({
     });
  
     that.button.on('release', function() {
-      that.led.turnOff();
-      that.writeMessage("Doorbot ready");
+      that.led.reset();
     });
   }
 }).start();

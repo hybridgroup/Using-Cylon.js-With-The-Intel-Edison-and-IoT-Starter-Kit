@@ -27,8 +27,7 @@ cylon.robot({
     that.buzzer.digitalWrite(1);
     that.writeMessage("Doorbell pressed", "green");
     setTimeout(function() {
-      that.buzzer.digitalWrite(0);
-      that.writeMessage("Doorbot ready");
+      that.reset();
     }, 1000);
   },
   writeMessage: function(message, color) {
@@ -56,14 +55,14 @@ cylon.robot({
         break;
     }
   },
-  setup: function() {
+  reset: function() {
     this.writeMessage("Doorbot ready");
     this.led.turnOff();
     this.buzzer.digitalWrite(0);
   },
   work: function() {
     var that = this;
-    that.setup();
+    that.reset();
 
     that.button.on('push', function() {
       that.led.turnOn();
@@ -71,8 +70,7 @@ cylon.robot({
     });
  
     that.button.on('release', function() {
-      that.led.turnOff();
-      that.writeMessage("Doorbot ready");
+      that.led.reset();
     });
 
     that.touch.on('push', function() {
