@@ -40,17 +40,30 @@ cylon.robot({
       }, 200);
     }
   },
-  detectPerson: function(val) {
+  detectSound: function(val) {
     var that = this;
     if (val >= 450) {
-      console.log("sound:", val)
-      that.writeMessage("Person detected", "blue");
-      if (that.light.analogRead() <= 400) {
-        that.led.turnOn();
-        setInterval(function() {
-          that.led.turnOff();
-        }, 500);
-      }
+      console.log("Sound detected:", val)
+      that.writeMessage("Sound detected", "blue");
+      that.led.turnOn();
+      setTimeout(function() {
+        that.led.turnOff();
+        that.writeMessage("Doorbot ready");
+      }, 500);
+    }
+  },
+  detectLight: function(val) {
+    var that = this;
+    var date = new Date();
+    var currentHour = date.getHours();
+    if (currentHour > 19 && currentHour < 8 && val >= 450) {
+      console.log("Light detected:", val)
+      that.writeMessage("Light detected", "blue");
+      that.led.turnOn();
+      setTimeout(function() {
+        that.led.turnOff();
+        that.writeMessage("Doorbot ready");
+      }, 500);
     }
   },
   turnLock: function(val) {
@@ -68,6 +81,7 @@ cylon.robot({
     that.writeMessage("Doorbell pressed", "green");
     setTimeout(function() {
       that.buzzer.digitalWrite(0);
+      that.writeMessage("Doorbot ready");
     }, 1000);
   },
   writeMessage: function(message, color) {
@@ -117,7 +131,11 @@ cylon.robot({
     });
  
     that.sound.on('analogRead', function(val) {
-      that.detectPerson(val);
+      that.detectSound(val);
+    });
+
+    that.light.on('analogRead', function(val) {
+      that.detectLight(val);
     });
  
     that.touch.on('push', function() {
