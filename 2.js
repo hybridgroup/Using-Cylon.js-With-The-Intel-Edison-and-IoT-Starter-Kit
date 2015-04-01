@@ -8,17 +8,22 @@ cylon.robot({
     edison: { adaptor: "intel-iot" }
   },
   devices: {
-    led:    { driver: "led",    pin: 4, connection: "edison" },
-    touch:  { driver: "button", pin: 8, connection: "edison" }
+    // digital sensors
+    button: { driver: "button",        pin: 2, connection: "edison" },
+    led:    { driver: "led",           pin: 3, connection: "edison" },
+  },
+  setup: function() {
+    this.led.turnOff();
   },
   work: function() {
     var that = this;
- 
-    that.touch.on('push', function() {
+    that.setup();
+
+    that.button.on('push', function() {
       that.led.turnOn();
     });
  
-    that.touch.on('release', function() {
+    that.button.on('release', function() {
       that.led.turnOff();
     });
   }

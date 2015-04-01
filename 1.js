@@ -8,7 +8,7 @@ cylon.robot({
     edison: { adaptor: "intel-iot" }
   },
   devices: {
-    led: { driver: "led", pin: 4, connection: "edison" }
+    led: { driver: "led", pin: 3, connection: "edison" }
   },
   work: function() {
     var that = this;

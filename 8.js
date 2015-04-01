@@ -15,8 +15,9 @@ cylon.robot({
   },
   devices: {
     // digital sensors
-    servo:  { driver: "servo",         pin: 3, connection: "edison" },
-    led:    { driver: "led",           pin: 4, connection: "edison" },
+    button: { driver: "button",        pin: 2, connection: "edison" },
+    led:    { driver: "led",           pin: 3, connection: "edison" },
+    servo:  { driver: "servo",         pin: 5, connection: "edison" },
     buzzer: { driver: "direct-pin",    pin: 7, connection: "edison" },
     touch:  { driver: "button",        pin: 8, connection: "edison" },
     // analog sensors
@@ -26,52 +27,57 @@ cylon.robot({
     // i2c devices
     screen: { driver: "upm-jhd1313m1", connection: "edison" }
   },
-  detectPerson: function(val) {
-    var that = this;
-    if (val >= 450) {
-      console.log("sound:", val)
-      that.writeMessage("is somebody there?", "blue");
-      that.led.turnOn();
-      setInterval(function() {
-        that.led.turnOff();
-      }, 500);
-    }
-  },
   fireAlarm: function() {
     var that = this;
     var deg = that.temp.value();
     console.log("current temp:", deg);
-    if (deg >= 25) {
-      that.writeMessage("it's hot in here!", "red");
+    if (deg >= 30) {
+      that.writeMessage("Fire alarm!", "red");
       that.buzzer.digitalWrite(1);
       setTimeout(function() {
         that.buzzer.digitalWrite(0);
-        that.writeMessage("ready!");
       }, 200);
+    }
+  },
+  detectSound: function(val) {
+    var that = this;
+    if (val >= 450) {
+      console.log("Sound detected:", val)
+      that.writeMessage("Sound detected", "blue");
+      that.led.turnOn();
+      setTimeout(function() {
+        that.led.turnOff();
+        that.writeMessage("Doorbot ready");
+      }, 500);
+    }
+  },
+  turnLock: function(val) {
+    var that = this;
+    var currentAngle = that.servo.currentAngle();
+    var angle = val.fromScale(0, 1023).toScale(0,180) | 0;
+    if (angle <= currentAngle - 3 || angle >= currentAngle + 3) {
+      console.log("turning lock:", angle);
+      that.servo.angle(angle);
     }
   },
   doorbell: function() {
     var that = this;
     that.buzzer.digitalWrite(1);
-    that.writeMessage("anybody home?", "green");
+    that.writeMessage("Doorbell pressed", "green");
     setTimeout(function() {
-      that.writeMessage("ready!");
       that.buzzer.digitalWrite(0);
+      that.writeMessage("Doorbot ready");
     }, 1000);
-  },
-  turnLock: function(val) {
-    var that = this;
-    var angle = val.fromScale(0, 1023).toScale(0,180) | 0;
-    console.log("turning lock:", angle);
-    that.servo.angle(angle);
   },
   writeMessage: function(message, color) {
     var that = this;
+    var str = message.toString();
+    while (str.length < 16) {
+      str = str + " ";
+    }
     console.log(message);
-    that.screen.clear();
-    that.screen.home();
     that.screen.setCursor(0,0);
-    that.screen.write(message.toString());
+    that.screen.write(str);
     switch(color)
     {
       case "red":
@@ -88,21 +94,35 @@ cylon.robot({
         break;
     }
   },
+  setup: function() {
+    this.writeMessage("Doorbot ready");
+    this.led.turnOff();
+    this.buzzer.digitalWrite(0);
+  },
   work: function() {
     var that = this;
+    that.setup();
+
+    that.button.on('push', function() {
+      that.led.turnOn();
+      that.writeMessage("Lights On", "blue");
+    });
  
-    that.writeMessage("ready!");
- 
+    that.button.on('release', function() {
+      that.led.turnOff();
+      that.writeMessage("Doorbot ready");
+    });
+
     that.dial.on('analogRead', function(val) {
       that.turnLock(val);
     });
  
-    that.touch.on('push', function() {
-      that.doorbell();
+    that.sound.on('analogRead', function(val) {
+      that.detectSound(val);
     });
  
-    that.sound.on('analogRead', function(val) {
-      that.detectPerson(val);
+    that.touch.on('push', function() {
+      that.doorbell();
     });
  
     setInterval(function() {

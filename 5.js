@@ -15,28 +15,31 @@ cylon.robot({
   },
   devices: {
     // digital sensors
-    led:    { driver: "led",        pin: 4, connection: "edison" },
-    buzzer: { driver: "direct-pin", pin: 7, connection: "edison" },
-    touch:  { driver: "button",     pin: 8, connection: "edison" },
+    button: { driver: "button",        pin: 2, connection: "edison" },
+    led:    { driver: "led",           pin: 3, connection: "edison" },
+    buzzer: { driver: "direct-pin",    pin: 7, connection: "edison" },
+    touch:  { driver: "button",        pin: 8, connection: "edison" },
     // i2c devices
-    screen: { driver: "upm-jhd1313m1",  connection: "edison" }
+    screen: { driver: "upm-jhd1313m1", connection: "edison" }
   },
   doorbell: function() {
     var that = this;
     that.buzzer.digitalWrite(1);
-    that.writeMessage("anybody home?", "green");
+    that.writeMessage("Doorbell pressed", "green");
     setTimeout(function() {
-      that.writeMessage("ready!");
       that.buzzer.digitalWrite(0);
+      that.writeMessage("Doorbot ready");
     }, 1000);
   },
   writeMessage: function(message, color) {
     var that = this;
+    var str = message.toString();
+    while (str.length < 16) {
+      str = str + " ";
+    }
     console.log(message);
-    that.screen.clear();
-    that.screen.home();
     that.screen.setCursor(0,0);
-    that.screen.write(message.toString());
+    that.screen.write(str);
     switch(color)
     {
       case "red":
@@ -53,13 +56,27 @@ cylon.robot({
         break;
     }
   },
+  setup: function() {
+    this.writeMessage("Doorbot ready");
+    this.led.turnOff();
+    this.buzzer.digitalWrite(0);
+  },
   work: function() {
     var that = this;
+    that.setup();
+
+    that.button.on('push', function() {
+      that.led.turnOn();
+      that.writeMessage("Lights On", "blue");
+    });
  
-    that.writeMessage("ready!");
- 
+    that.button.on('release', function() {
+      that.led.turnOff();
+      that.writeMessage("Doorbot ready");
+    });
+
     that.touch.on('push', function() {
       that.doorbell();
-    });
+    }); 
   }
 }).start();

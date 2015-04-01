@@ -120,10 +120,12 @@ cylon.robot({
 
     that.button.on('push', function() {
       that.led.turnOn();
+      that.writeMessage("Lights On", "blue");
     });
  
     that.button.on('release', function() {
       that.led.turnOff();
+      that.writeMessage("Doorbot ready");
     });
 
     that.dial.on('analogRead', function(val) {
