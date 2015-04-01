@@ -72,9 +72,13 @@ cylon.robot({
   },
   writeMessage: function(message, color) {
     var that = this;
+    var str = message.toString();
+    while (str.length < 16) {
+      str = str + " ";
+    }
     console.log(message);
     that.screen.setCursor(0,0);
-    that.screen.write(pad(message.toString(), 16));
+    that.screen.write(str);
     switch(color)
     {
       case "red":
@@ -125,7 +129,3 @@ cylon.robot({
     }, 1000);
   }
 }).start();
-
-function pad(str, length) {
-  return str.length < length ? pad(str + " ", length) : str;
-};
