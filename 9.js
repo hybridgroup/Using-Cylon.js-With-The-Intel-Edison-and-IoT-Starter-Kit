@@ -16,8 +16,8 @@ cylon.robot({
   devices: {
     // digital sensors
     button: { driver: "button",        pin: 2, connection: "edison" },
-    servo:  { driver: "servo",         pin: 3, connection: "edison" },
-    led:    { driver: "led",           pin: 4, connection: "edison" },
+    led:    { driver: "led",           pin: 3, connection: "edison" },
+    servo:  { driver: "servo",         pin: 5, connection: "edison" },
     buzzer: { driver: "direct-pin",    pin: 7, connection: "edison" },
     touch:  { driver: "button",        pin: 8, connection: "edison" },
     // analog sensors
@@ -33,7 +33,7 @@ cylon.robot({
     var deg = that.temp.value();
     console.log("current temp:", deg);
     if (deg >= 30) {
-      that.writeMessage("it's hot in here!", "red");
+      that.writeMessage("Fire alarm!", "red");
       that.buzzer.digitalWrite(1);
       setTimeout(function() {
         that.buzzer.digitalWrite(0);
@@ -44,7 +44,7 @@ cylon.robot({
     var that = this;
     if (val >= 450) {
       console.log("sound:", val)
-      that.writeMessage("is somebody there?", "blue");
+      that.writeMessage("Person detected", "blue");
       if (that.light.analogRead() <= 400) {
         that.led.turnOn();
         setInterval(function() {
@@ -65,7 +65,7 @@ cylon.robot({
   doorbell: function() {
     var that = this;
     that.buzzer.digitalWrite(1);
-    that.writeMessage("anybody home?", "green");
+    that.writeMessage("Doorbell pressed", "green");
     setTimeout(function() {
       that.buzzer.digitalWrite(0);
     }, 1000);
@@ -74,7 +74,7 @@ cylon.robot({
     var that = this;
     console.log(message);
     that.screen.setCursor(0,0);
-    that.screen.write(message.toString());
+    that.screen.write(pad(message.toString(), 16));
     switch(color)
     {
       case "red":
@@ -92,7 +92,7 @@ cylon.robot({
     }
   },
   setup: function() {
-    this.writeMessage("ready");
+    this.writeMessage("Doorbot ready");
     this.led.turnOff();
     this.buzzer.digitalWrite(0);
   },
@@ -125,3 +125,7 @@ cylon.robot({
     }, 1000);
   }
 }).start();
+
+function pad(str, length) {
+  return str.length < length ? pad(str + " ", length) : str;
+};
