@@ -70,7 +70,7 @@ cylon.robot({
     });
  
     that.button.on('release', function() {
-      that.led.reset();
+      that.reset();
     });
 
     that.touch.on('push', function() {
