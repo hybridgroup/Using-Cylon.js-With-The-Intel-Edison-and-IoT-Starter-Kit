@@ -1,13 +1,13 @@
 "use strict";
- 
+
 var cylon = require("cylon");
- 
+
 cylon.api({
   host: "0.0.0.0",
   port: "3000",
   ssl: false
 });
- 
+
 cylon.robot({
   name: "doorbot",
   connections: {
@@ -21,9 +21,9 @@ cylon.robot({
     buzzer: { driver: "direct-pin",    pin: 7, connection: "edison" },
     touch:  { driver: "button",        pin: 8, connection: "edison" },
     // analog sensors
-    dial:   { driver: "analogSensor",  pin: 0, connection: "edison" },
+    dial:   { driver: "analog-sensor",  pin: 0, connection: "edison" },
     // i2c devices
-    screen: { driver: "upm-jhd1313m1", connection: "edison" }
+    screen: { driver: "jhd1313m1", connection: "edison" }
   },
   turnLock: function(val) {
     var that = this;
@@ -80,7 +80,7 @@ cylon.robot({
       that.led.turnOn();
       that.writeMessage("Lights On", "blue");
     });
- 
+
     that.button.on('release', function() {
       that.reset();
     });
@@ -88,9 +88,9 @@ cylon.robot({
     that.dial.on('analogRead', function(val) {
       that.turnLock(val);
     });
- 
+
     that.touch.on('push', function() {
       that.doorbell();
-    }); 
+    });
   }
 }).start();

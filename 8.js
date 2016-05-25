@@ -1,13 +1,13 @@
 "use strict";
- 
+
 var cylon = require("cylon");
- 
+
 cylon.api({
   host: "0.0.0.0",
   port: "3000",
   ssl: false
 });
- 
+
 cylon.robot({
   name: "doorbot",
   connections: {
@@ -21,15 +21,15 @@ cylon.robot({
     buzzer: { driver: "direct-pin",    pin: 7, connection: "edison" },
     touch:  { driver: "button",        pin: 8, connection: "edison" },
     // analog sensors
-    dial:   { driver: "analogSensor",  pin: 0, connection: "edison" },
-    temp:   { driver: "upm-grovetemp", pin: 1, connection: "edison" },
-    sound:  { driver: "analogSensor",  pin: 2, connection: "edison" },
+    dial:   { driver: "analog-sensor",  pin: 0, connection: "edison" },
+    temp:   { driver: "temperature-sensor", pin: 1, connection: "edison" },
+    sound:  { driver: "analog-sensor",  pin: 2, connection: "edison" },
     // i2c devices
-    screen: { driver: "upm-jhd1313m1", connection: "edison" }
+    screen: { driver: "jhd1313m1", connection: "edison" }
   },
   fireAlarm: function() {
     var that = this;
-    var deg = that.temp.value();
+    var deg = that.temp.celsius();
     console.log("current temp:", deg);
     if (deg >= 30) {
       that.writeMessage("Fire alarm!", "red");
@@ -105,7 +105,7 @@ cylon.robot({
       that.led.turnOn();
       that.writeMessage("Lights On", "blue");
     });
- 
+
     that.button.on('release', function() {
       that.reset();
     });
@@ -113,15 +113,15 @@ cylon.robot({
     that.dial.on('analogRead', function(val) {
       that.turnLock(val);
     });
- 
+
     that.sound.on('analogRead', function(val) {
       that.detectSound(val);
     });
- 
+
     that.touch.on('push', function() {
       that.doorbell();
     });
- 
+
     setInterval(function() {
       that.fireAlarm();
     }, 1000);
