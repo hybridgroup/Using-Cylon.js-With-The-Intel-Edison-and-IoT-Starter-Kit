@@ -1,7 +1,7 @@
 "use strict";
- 
+
 var cylon = require("cylon");
- 
+
 cylon.robot({
   name: "doorbot",
   connections: {
@@ -12,7 +12,7 @@ cylon.robot({
     button: { driver: "button",        pin: 2, connection: "edison" },
     led:    { driver: "led",           pin: 3, connection: "edison" },
     // i2c devices
-    screen: { driver: "upm-jhd1313m1", connection: "edison" }
+    screen: { driver: "jhd1313m1", connection: "edison" }
   },
   writeMessage: function(message, color) {
     var that = this;
@@ -51,7 +51,7 @@ cylon.robot({
       that.led.turnOn();
       that.writeMessage("Lights On", "blue");
     });
- 
+
     that.button.on('release', function() {
       that.reset();
     });
